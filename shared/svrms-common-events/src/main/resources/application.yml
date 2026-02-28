@@ -1,0 +1,42 @@
+# Event Platform Configuration
+events:
+  kafka:
+    topics:
+      default: events
+      dead-letter: events-dlq
+    producer:
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 10
+      compression-type: snappy
+    consumer:
+      group-id: ${spring.application.name}-consumer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 500
+      concurrency: 3
+
+  schema:
+    validation:
+      strict: true
+
+  security:
+    secret-key: ${EVENT_SECURITY_SECRET:}
+
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+  application:
+    name: event-platform
+
+# Micrometer/Observability
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0

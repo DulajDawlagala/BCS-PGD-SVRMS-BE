@@ -1,0 +1,70 @@
+# src/main/resources/application-dev.yml
+
+server:
+  port: 8088
+
+spring:
+  application:
+    name: notification-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:svrms_notification_db}
+    username: ${DB_USERNAME:svrms}
+    password: ${DB_PASSWORD:svrms_password_2024}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:notification-service-dev-group}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      properties:
+#        spring.json.trusted.packages: "*"
+
+
+
+
+# ==========================
+# Kafka Topics (Logical Names)
+# ==========================
+kafka:
+  topics:
+    email: ${KAFKA_TOPIC_EMAIL:dev.email-notification-requested}
+    inapp: ${KAFKA_TOPIC_INAPP:dev.inapp-notification-requested}
+
+# ==========================
+# SendGrid Configuration
+# ==========================
+
+
+# ==========================
+# Rate Limiting
+# ==========================
+resilience:
+  ratelimit:
+    max-requests-per-window: ${RATE_LIMIT_MAX_REQUESTS:100}
+    window-duration-seconds: ${RATE_LIMIT_WINDOW_SECONDS:60}
+
+# ==========================
+# Logging
+# ==========================
+logging:
+  level:
+    root: INFO
+    com.svrmslk.notificationservice: DEBUG
+    org.springframework.kafka: INFO
+    org.hibernate.SQL: DEBUG
+

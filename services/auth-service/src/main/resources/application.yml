@@ -1,0 +1,140 @@
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/svrms_auth_db
+    username: svrms
+    password: svrms_password_2024
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # Flyway configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+    out-of-order: false
+    placeholder-replacement: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+  # Security OAuth2 configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope: openid,profile,email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+kafka:
+  enabled: ${KAFKA_ENABLED:true}
+
+email:
+  enabled: ${EMAIL_ENABLED:true}
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${ENVIRONMENT:dev}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+# Application info for actuator /info endpoint
+info:
+  app:
+    name: Rental Platform Auth Service
+    description: Multi-tenant SaaS authentication and authorization service
+    version: 1.0.0
+    java-version: ${java.version}
+
+# ================================
+# JWT Configuration
+# ================================
+jwt:
+  access-token:
+    secret: ${JWT_ACCESS_SECRET:ProdAccessSecret2024-MustBe48CharsMinimum-HS384-CompXZ1}
+    validity-seconds: 900
+  refresh-token:
+    secret: ${JWT_REFRESH_SECRET:ProdRefreshSecret2024-MustBe48CharsMinimum-HS384-CompXZ1}
+    validity-days: 30
+
+# Swagger/OpenAPI configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    displayRequestDuration: true
+    defaultModelsExpandDepth: 1
+    defaultModelExpandDepth: 1
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+logging:
+  level:
+    com.svrmslk.authservice: INFO
+    org.springframework.security: DEBUG
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

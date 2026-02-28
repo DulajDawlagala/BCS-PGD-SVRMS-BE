@@ -1,0 +1,33 @@
+  spring:
+    datasource:
+      url: jdbc:h2:mem:testdb
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+
+    jpa:
+      hibernate:
+        ddl-auto: create-drop
+      show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.H2Dialect
+
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: test-group
+        auto-offset-reset: earliest
+
+    flyway:
+      enabled: false
+
+  sendgrid:
+    api-key: test-api-key
+    from-email: test@example.com
+    from-name: Test Service
+    timeout-seconds: 5
+
+  logging:
+    level:
+      com.svrmslk.notificationservice: DEBUG

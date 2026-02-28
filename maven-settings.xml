@@ -1,0 +1,31 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0
+          https://maven.apache.org/xsd/settings-1.2.0.xsd">
+
+    <mirrors>
+        <mirror>
+            <id>central-mirror</id>
+            <mirrorOf>central</mirrorOf>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </mirror>
+    </mirrors>
+
+    <profiles>
+        <profile>
+            <id>retry-profile</id>
+            <properties>
+                <!-- CRITICAL for Docker TLS -->
+                <maven.wagon.http.pool>false</maven.wagon.http.pool>
+                <maven.wagon.http.retryHandler.count>10</maven.wagon.http.retryHandler.count>
+                <maven.wagon.http.retryHandler.requestSentEnabled>true</maven.wagon.http.retryHandler.requestSentEnabled>
+                <maven.wagon.httpconnectionManager.ttlSeconds>25</maven.wagon.httpconnectionManager.ttlSeconds>
+                <https.protocols>TLSv1.2</https.protocols>
+            </properties>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>retry-profile</activeProfile>
+    </activeProfiles>
+</settings>

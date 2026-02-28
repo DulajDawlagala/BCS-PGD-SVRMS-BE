@@ -1,0 +1,84 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: gateway-service
+
+  main:
+    lazy-initialization: true   # 🔹 important for Docker startup stability
+
+  cloud:
+    gateway:
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter:
+              replenishRate: 100
+              burstCapacity: 100
+              requestedTokens: 1
+              fail-fast: false    # 🔹 prevents fail-fast on Redis startup
+            key-resolver: "#{@ipKeyResolver}"
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+              - "http://localhost:3001"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            exposedHeaders:
+              - Authorization
+            maxAge: 3600
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+
+jwt:
+  access-token:
+    secret: ${JWT_ACCESS_SECRET:ProdAccessSecret2024-MustBe48CharsMinimum-HS384-CompXZ1}
+  refresh-token:
+    secret: ${JWT_REFRESH_SECRET:ProdRefreshSecret2024-MustBe48CharsMinimum-HS384-CompXZ1}
+
+services:
+  auth-service:
+    url: ${AUTH_SERVICE_URL:http://localhost:8080}
+  customer-service:
+    url: ${CUSTOMER_SERVICE_URL:http://localhost:8082}
+  tenant-service:
+    url: ${TENANT_SERVICE_URL:http://localhost:8081}
+  notification-service:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
+  company-service:
+    url: ${COMPANY_SERVICE_URL:http://localhost:8086}
+  booking-service:
+      url: ${BOOKING_SERVICE_URL:http://localhost:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    root: INFO
+    com.svrmslk.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

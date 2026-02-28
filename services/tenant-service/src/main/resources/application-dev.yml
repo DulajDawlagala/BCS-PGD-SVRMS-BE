@@ -1,0 +1,47 @@
+## ==========================================
+## FILE: application-dev.yml
+## ==========================================
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/svrms_infrastructure
+    username: svrms
+    password: svrms_password_2024
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      initialization-fail-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: never
+
+# ==========================
+# Tenant configuration
+# ==========================
+tenant:
+  provisioning:
+    async: false
+
+# ==========================
+# Logging
+# ==========================
+logging:
+  level:
+    root: INFO
+    com.svrmslk.tenant: TRACE

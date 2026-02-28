@@ -1,0 +1,33 @@
+# ==========================================
+# FILE: application-test.yml
+# ==========================================
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+  flyway:
+    enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.svrmslk.tenant: DEBUG
